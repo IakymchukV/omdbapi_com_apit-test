@@ -8,15 +8,27 @@ repositories {
     mavenCentral()
 }
 
-ext{
-    testNgVersion = '6.13'
+ext {
+    restAssuredVersion = '3.3.0'
+    testNGVersion = '6.13'
     jacksonVersion = '2.9.8'
-
+    fakerVersion = '1.0.1'
+    logbackVersion = '1.2.3'
+    slf4jVersion = '1.7.29'
+    ownerVersion = '1.0.10'
 }
 
 dependencies {
-    testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
-    testCompile "org.testng:testng:$testNgVersion"
+    compile "io.rest-assured:rest-assured:$restAssuredVersion"
+    testCompile "org.testng:testng:$testNGVersion"
     compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
 
+    compile "org.slf4j:slf4j-api:$slf4jVersion"
+    compile "ch.qos.logback:logback-classic:$logbackVersion"
+    compile "ch.qos.logback:logback-core:$logbackVersion"
+    compile "org.aeonbits.owner:owner:$ownerVersion"
+
+    compile "com.github.javafaker:javafaker:$fakerVersion"
+    compile group: 'io.cucumber', name: 'cucumber-java', version: '5.5.0'
 }
+

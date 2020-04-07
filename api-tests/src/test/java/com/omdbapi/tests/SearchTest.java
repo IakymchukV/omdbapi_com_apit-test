@@ -1,37 +1,68 @@
 package com.omdbapi.tests;
 
-import com.omdbapi.api.payloads.RatingsItem;
-import com.omdbapi.api.payloads.SearchPayload;
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import org.testng.annotations.BeforeClass;
+import com.omdbapi.api.services.SearchApiService;
 import org.testng.annotations.Test;
 
-import static org.hamcrest.Matchers.isEmptyString;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
 
+public class SearchTest extends BaseTest {
 
-public class SearchTest {
+    private static final SearchApiService searchApiService = new SearchApiService();
 
-    @BeforeClass
-    public void setUp(){
-        RestAssured.baseURI = "http://www.omdbapi.com";
+    @Test
+    public void testSearchFilmNameOnly() {
+        searchApiService.searchFilm("Iron Man")
+                .get().then().log().all()
+                .assertThat()
+                .statusCode(200)
+                .body("Response", not("False"));
     }
 
     @Test
-    public void testSearchFilm(){
-            SearchPayload search = new SearchPayload();
+    public void testSearchFilmNameYear() {
+        searchApiService.searchFilm("The Lord of the Rings", "1978")
+                .get().then().log().all()
+                .assertThat()
+                .statusCode(200)
+                .body("Response", not("False"));
+    }
 
+    @Test
+    public void testSearchFilmFillAllFields() {
+        searchApiService.searchFilm("Woman", "2000", "Short", "JSON")
+                .get().then().log().all()
+                .assertThat()
+                .statusCode(200)
+                .body("Response", not("False"));
+    }
 
-            RestAssured
-                    .given().contentType(ContentType.JSON).log().all()
-                    .body(search)
-                    .when()
-                    .post()
-                    .then().log().all()
-                    .assertThat()
-                    .statusCode(200)
-                    .body("title", not(isEmptyString()));
+    @Test
+    public void testSearchFilmEmptyName() {
+        searchApiService.searchFilm("", "2000")
+                .get().then().log().all()
+                .assertThat()
+                .statusCode(200)
+                .body("Response", is("False"));
+    }
+
+    @Test
+    public void testSerchReturnXml() {
+        searchApiService.searchFilm("Star Wars", "2000", "Full", "XML")
+                .get().then().log().all()
+                .assertThat()
+                .statusCode(200)
+                .body("Response", not("False"))
+                .header("Content-Type", is("text/xml; charset=utf-8"));
+    }
+
+    @Test
+    public void testSearchInvalidYear() {
+        searchApiService.searchFilm("Star Wars", "-123", "bla")
+                .get().then().log().all()
+                .assertThat()
+                .statusCode(200)
+                .body("Response", is("False"));
     }
 }
