@@ -1,5 +1,6 @@
 package com.omdbapi.tests;
 
+import com.omdbapi.api.payloads.SearchPayload;
 import com.omdbapi.api.services.SearchApiService;
 import org.testng.annotations.Test;
 
@@ -13,7 +14,8 @@ public class SearchTest extends BaseTest {
 
     @Test
     public void testSearchFilmNameOnly() {
-        searchApiService.searchFilm("Iron Man")
+        SearchPayload searchPayload = new SearchPayload();
+        searchApiService.searchFilm(searchPayload.title("Iron Man"))
                 .get().then().log().all()
                 .assertThat()
                 .statusCode(200)
@@ -22,16 +24,20 @@ public class SearchTest extends BaseTest {
 
     @Test
     public void testSearchFilmNameYear() {
-        searchApiService.searchFilm("The Lord of the Rings", "1978")
+        SearchPayload searchPayload = new SearchPayload();
+        searchApiService.searchFilm(searchPayload.title("The Lord of the Rings ").year("1978"))
                 .get().then().log().all()
                 .assertThat()
                 .statusCode(200)
                 .body("Response", not("False"));
     }
 
+    //TODO DataProvider , Verify all searched field
+
     @Test
     public void testSearchFilmFillAllFields() {
-        searchApiService.searchFilm("Woman", "2000", "Short", "JSON")
+        SearchPayload searchPayload = new SearchPayload();
+        searchApiService.searchFilm(searchPayload.title("Woman").year( "2000").plot( "Short").response( "JSON"))
                 .get().then().log().all()
                 .assertThat()
                 .statusCode(200)
@@ -40,7 +46,9 @@ public class SearchTest extends BaseTest {
 
     @Test
     public void testSearchFilmEmptyName() {
-        searchApiService.searchFilm("", "2000")
+        SearchPayload searchPayload = new SearchPayload();
+
+        searchApiService.searchFilm(searchPayload.title("Woman").year( "2000").plot( "Short").response( "JSON"))
                 .get().then().log().all()
                 .assertThat()
                 .statusCode(200)
@@ -49,7 +57,8 @@ public class SearchTest extends BaseTest {
 
     @Test
     public void testSerchReturnXml() {
-        searchApiService.searchFilm("Star Wars", "2000", "Full", "XML")
+        SearchPayload searchPayload = new SearchPayload();
+        searchApiService.searchFilm(searchPayload.title("Woman").year( "2000").plot( "Short").response( "XML"))
                 .get().then().log().all()
                 .assertThat()
                 .statusCode(200)
@@ -59,7 +68,8 @@ public class SearchTest extends BaseTest {
 
     @Test
     public void testSearchInvalidYear() {
-        searchApiService.searchFilm("Star Wars", "-123", "bla")
+        SearchPayload searchPayload = new SearchPayload();
+        searchApiService.searchFilm(searchPayload.title("Woman").year( "-2034").plot( "Short").response( "JSON"))
                 .get().then().log().all()
                 .assertThat()
                 .statusCode(200)

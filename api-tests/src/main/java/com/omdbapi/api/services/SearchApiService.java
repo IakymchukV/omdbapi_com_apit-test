@@ -1,43 +1,19 @@
 package com.omdbapi.api.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.omdbapi.api.payloads.SearchPayload;
 import io.restassured.specification.RequestSpecification;
 
+import java.util.Collections;
+import java.util.Map;
+
 public class SearchApiService extends ApiService {
-    private final String titleJSON = "t";
-    private final String yearJSON = "y";
-    private final String plotJSON = "plot";
-    private final String responseJSON = "r";
 
-    public RequestSpecification searchFilm(String filmName) {
+    public RequestSpecification searchFilm(SearchPayload searchPayload) {
+        ObjectMapper oMapper = new ObjectMapper();
+        Map<String, Object> map = oMapper.convertValue(searchPayload, Map.class);
+        map.values().removeAll(Collections.singleton(null));
         return setup()
-                .param(titleJSON, filmName)
-                .param(yearJSON, "")
-                .param(plotJSON, "")
-                .param(responseJSON, "");
-    }
-
-    public RequestSpecification searchFilm(String filmName, String year) {
-        return setup()
-                .param(titleJSON, filmName)
-                .param(yearJSON, year)
-                .param(plotJSON, "")
-                .param(responseJSON, "");
-    }
-
-    public RequestSpecification searchFilm(String filmName, String year, String plot) {
-        return setup()
-                .param(titleJSON, filmName)
-                .param(yearJSON, year)
-                .param(plotJSON, plot)
-                .param(responseJSON, "");
-
-    }
-
-    public RequestSpecification searchFilm(String filmName, String year, String plot, String response) {
-        return setup()
-                .param(titleJSON, filmName)
-                .param(yearJSON, year)
-                .param(plotJSON, plot)
-                .param(responseJSON, response);
+                .params(map);
     }
 }
